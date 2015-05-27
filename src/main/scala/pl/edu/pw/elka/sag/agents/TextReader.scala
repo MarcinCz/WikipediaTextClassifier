@@ -12,7 +12,7 @@ trait TextReader {
     folder.listFiles()
   }
   
-  def readFile(file: File):String = {
+  def readFile(file: File): String = {
     new String(Files.readAllBytes(Paths.get(file.getPath())))
   }
 }

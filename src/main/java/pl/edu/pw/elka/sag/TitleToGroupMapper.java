@@ -37,13 +37,8 @@ public class TitleToGroupMapper {
     }
 
     public static void main(String[] args) {
-        FileInputStream fileStream = null;
-        try {
-            fileStream = new FileInputStream("input.txt");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
+        InputStream fileStream = null;
+        fileStream = TitleToGroupMapper.class.getClass().getResourceAsStream("/input.txt");
 
         final TitleToGroupMapper mapper = new TitleToGroupMapper(fileStream);
         mapper.readGroups();

@@ -1,24 +1,35 @@
 package pl.edu.pw.elka.sag.agents
 
 import akka.actor.Actor
+import akka.actor.Props
+import akka.routing.RoundRobinPool
+import akka.event.Logging
 
 
-class MasterActor extends Actor{
+class MasterActor extends Actor with TimePrinter{
 
-  def receive: Receive =  { null }
-/*  val workerActors = context.actorOf(RoundRobinPool(5).props(Props[WorkerActor]), name = "WorkerActors")
+	val log = Logging(context.system, this)
 
-   def receive: Receive = {     
-     case request => {       
-       workerActors forward request
-     }    
+  val workerActors = context.actorOf(Props[TextProcessingActor].withRouter(RoundRobinPool(AppConfig.poolSize)), name = "WorkerActors")   
+  var repliesCount = 0
+  var requestCount = 0
+  
+  def receive: Receive = {     
+     case response: String => {
+       repliesCount += 1
+       log.info("Reply " + repliesCount + "/" + requestCount)
+       if(repliesCount == requestCount) {
+         AgentSystemTimer.stop
+         printTime("Agents", AgentSystemTimer.time)
+         context.system.shutdown()
+       }
+     }
+     
+     case request: TextProcessingActorRequest => {       
+    	 requestCount += 1
+       workerActors ! request
+     }
+     
+     case _ => log.error("Wrong message ")
   }
-  var router = {
-    val routees = Vector.fill(5) {
-      val r = context.actorOf(Props(new ArticleProcessingActor(extractor = extractor)))
-      context watch r
-      ActorRefRoutee(r)
-    }
-    Router(RoundRobinRoutingLogic(), routees)
-  }*/
 }
